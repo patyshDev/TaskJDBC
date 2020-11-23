@@ -11,6 +11,7 @@ import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
+    private Session session = null;
 
     public UserDaoHibernateImpl() {
 
@@ -19,7 +20,8 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try {
+            session = Util.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             Query query = session.createSQLQuery("create table if not exists users(" +
                     "id bigint auto_increment primary key," +
@@ -28,6 +30,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     "age tinyint not null);");
             query.executeUpdate();
             tx.commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,11 +38,13 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try {
+            session = Util.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             Query query = session.createSQLQuery("drop table if exists users");
             query.executeUpdate();
             tx.commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -47,12 +52,14 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try {
+            session = Util.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             Query query = session.createSQLQuery(String.format("insert into users (name, lastname, age)" +
                     " values ('%s', '%s', %d);", name, lastName, age));
             query.executeUpdate();
             tx.commit();
+            session.close();
             System.out.println("User с именем – " +  name + " добавлен в базу данных");
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,11 +68,13 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void removeUserById(long id) {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try {
+            session = Util.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             Query query = session.createSQLQuery("delete from users where id = " + id);
             query.executeUpdate();
             tx.commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,10 +83,12 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try {
+            session = Util.getSessionFactory().openSession();
             users = session.createSQLQuery("select * from users").addEntity(User.class).list();
             for (User user: users)
                 System.out.println(user);
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,11 +97,13 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try {
+            session = Util.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             Query query = session.createSQLQuery("delete from users");
             query.executeUpdate();
             tx.commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
